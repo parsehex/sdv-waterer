@@ -13,6 +13,7 @@ The `config.json` has the following options:
   - The final cost of watering everything is rounded down to the nearest whole number.
 - `WaterAll` (default false) - Whether all "hoe-d" tiles should be watered, or only the ones where a crop is planted.
   - Set to false (the default) to water crops only.
+- `SkipFullyGrown` - Whether to skip watering fully-grown crops.
 - `Message` (default true) - Whether to show a message afterwards showing how many crops were watered and how much it cost.
 
 ## Note to Developers

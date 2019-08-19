@@ -117,6 +117,9 @@ namespace Waterer {
 				// only water crops if WaterAll is false
 				if (!this.config.WaterAll && dirt.crop == null) continue;
 
+				// skip fully-grown crops with SkipFullyGrown
+				if (this.config.SkipFullyGrown && dirt.crop?.fullyGrown) continue;
+
 				// don't re-water
 				if (dirt.state.Value == 1) continue;
 

@@ -15,5 +15,8 @@
 		// whether to show a message in-game after the deed is done
 		public bool Message { get; set; } = true;
 
+		// whether to skip watering fully-grown crops
+		public bool SkipFullyGrown { get; set; } = true;
+
 		public bool debug {get;set;} = false;
 	}
