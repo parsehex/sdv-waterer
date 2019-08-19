@@ -35,8 +35,8 @@ namespace Waterer {
 				Farmer farmer = Game1.player;
 
 				if (farmer.Money == 0 && this.config.Price > 0) {
-					HUDMessage msg = new HUDMessage("Out of gold!");
-					Game1.addHUDMessage(msg, 3); // 3 = error
+					HUDMessage msg = new HUDMessage("Out of gold!", 3); // 3 = error
+					Game1.addHUDMessage(msg);
 					return;
 				}
 
@@ -59,8 +59,8 @@ namespace Waterer {
 
 			if (this.ranOutOfMoney) {
 				// show out-of-money-message as well as how much got done
-				HUDMessage msg = new HUDMessage("Couldn't water everything (no more gold)!");
-				Game1.addHUDMessage(msg, 3); // 3 = error
+				HUDMessage msg = new HUDMessage("Couldn't water everything (no more gold)!", 3); // 3 = error
+				Game1.addHUDMessage(msg);
 			}
 
 			this.showMessage(cost);
@@ -83,8 +83,8 @@ namespace Waterer {
 				text += $", costing {cost}g";
 			}
 
-			HUDMessage msg = new HUDMessage(text);
-			Game1.addHUDMessage(msg, 2); // 2 = yellow exclamation
+			HUDMessage msg = new HUDMessage(text, 2); // 2 = yellow exclamation
+			Game1.addHUDMessage(msg);
 		}
 
 		private void waterAllCrops(Farmer farmer) {
