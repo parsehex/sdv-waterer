@@ -1,0 +1,10 @@
+﻿{
+  "Name": "Waterer",
+  "Author": "parsehex",
+  "Version": "1.0.0",
+  "Description": "Allows you to pay gold to automatically water your crops.",
+  "UniqueID": "parsehex.waterer",
+  "EntryDll": "Waterer.dll",
+  "MinimumApiVersion": "2.10.0",
+  "UpdateKeys": []
+}
