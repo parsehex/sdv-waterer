@@ -1,6 +1,0 @@
-/home/thomas/Projects/Waterer/Waterer/bin/Debug/Waterer.dll
-/home/thomas/Projects/Waterer/Waterer/bin/Debug/Waterer.pdb
-/home/thomas/Projects/Waterer/Waterer/obj/Debug/Waterer.csprojAssemblyReference.cache
-/home/thomas/Projects/Waterer/Waterer/obj/Debug/Waterer.csproj.CoreCompileInputs.cache
-/home/thomas/Projects/Waterer/Waterer/obj/Debug/Waterer.dll
-/home/thomas/Projects/Waterer/Waterer/obj/Debug/Waterer.pdb
