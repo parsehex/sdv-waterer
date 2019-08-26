@@ -15,6 +15,7 @@ The `config.json` has the following options:
   - Set to false (the default) to water crops only.
 - `SkipFullyGrown` - Whether to skip watering fully-grown crops.
 - `Message` (default true) - Whether to show a message afterwards showing how many crops were watered and how much it cost.
+- `AutoWaterEveryDay` (default false) - Whether to (try to) water crops at the start of every day.
 
 ## Note to Developers
 

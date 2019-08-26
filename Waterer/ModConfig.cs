@@ -17,5 +17,8 @@ class ModConfig {
 	// whether to skip watering fully-grown crops
 	public bool SkipFullyGrown { get; set; } = true;
 
-	public bool debug {get;set;} = false;
+	// whether to automatically water crops every day
+	public bool AutoWaterEveryDay { get; set; } = false;
+
+	public bool debug { get; set; } = false;
 }

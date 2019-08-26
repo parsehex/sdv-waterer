@@ -20,35 +20,52 @@ namespace Waterer {
 
 		public override void Entry(IModHelper helper) {
 			this.config = this.Helper.ReadConfig<ModConfig>();
+
 			helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+			helper.Events.GameLoop.DayStarted += this.OnDayStarted;
 
 			this.log("Mod loaded");
+
+			if (this.config.debug) this.log("Debug mode enabled");
 		}
 
 		private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
 			// not in-game
 			if (!Context.IsWorldReady) return;
 
-			if (e.Button.ToString() == this.config.KeyBind) {
-				this.log($"Pressed {this.config.KeyBind}");
+			// not keybind button
+			if (e.Button.ToString() != this.config.KeyBind) return;
 
-				Farmer farmer = Game1.player;
+			this.log($"Pressed {this.config.KeyBind}");
 
-				if (farmer.Money == 0 && this.config.Price > 0) {
-					HUDMessage msg = new HUDMessage("Out of gold!", 3); // 3 = error
-					Game1.addHUDMessage(msg);
-					return;
-				}
+			this.activate();
+		}
 
-				// reset
-				this.cropsWatered = 0;
-				this.ranOutOfMoney = false;
-				this.maxCropsToWater = this.calculateMaxAffordable(farmer);
+		private void OnDayStarted(object sender, DayStartedEventArgs e) {
+			if (!this.config.AutoWaterEveryDay) return;
 
-				this.waterAllCrops(farmer);
+			this.log("Auto-watering");
 
-				this.chargeFarmer(farmer);
+			this.activate();
+		}
+
+		private void activate() {
+			Farmer farmer = Game1.player;
+
+			if (farmer.Money == 0 && this.config.Price > 0) {
+				HUDMessage msg = new HUDMessage("Out of gold!", 3); // 3 = error
+				Game1.addHUDMessage(msg);
+				return;
 			}
+
+			// reset
+			this.cropsWatered = 0;
+			this.ranOutOfMoney = false;
+			this.maxCropsToWater = this.calculateMaxAffordable(farmer);
+
+			this.waterAllCrops(farmer);
+
+			this.chargeFarmer(farmer);
 		}
 
 		private void chargeFarmer(Farmer farmer) {
