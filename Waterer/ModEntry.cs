@@ -131,8 +131,6 @@ namespace Waterer {
 				// skip non-hoed dirt
 				if (!(feature.Value is HoeDirt dirt)) continue;
 
-				this.log($"Skipping fully-grown crop {dirt.crop?.regrowAfterHarvest.Value}");
-
 				// if WaterAll is false, only water crops
 				if (!this.config.WaterAll && dirt.crop == null) {
 					this.log("Skipping non-crop");
@@ -141,7 +139,10 @@ namespace Waterer {
 
 				// skip fully-grown crops with SkipFullyGrown
 				// (always water regrowing crops though)
-				if (this.config.SkipFullyGrown && (dirt.crop?.fullyGrown && dirt.crop?.regrowAfterHarvest.Value == -1)) {
+				if (
+					this.config.SkipFullyGrown &&
+					(dirt.crop?.fullyGrown && dirt.crop?.regrowAfterHarvest.Value == -1)
+				) {
 					this.log("Skipping fully-grown crop");
 					continue;
 				}
