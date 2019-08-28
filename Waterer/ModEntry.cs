@@ -168,7 +168,8 @@ namespace Waterer {
 		private int calculateCost() {
 			if (this.config.Price == 0) return 0;
 
-			return (int)Math.Round(this.config.Price * this.cropsWatered);
+			 // charge at least 1g
+			return Math.Max(1, (int)Math.Round(this.config.Price * this.cropsWatered));
 		}
 	}
 }
