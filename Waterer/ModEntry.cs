@@ -12,6 +12,8 @@ namespace Waterer {
 		private int cropsWatered = 0;
 		private int maxCropsToWater = 0;
 		private bool ranOutOfMoney = false;
+		private bool autoWatering = false;
+		private int cropsSkipped = 0;
 
 		private void log(string text) {
 			if (!this.config.debug) return;
@@ -36,6 +38,8 @@ namespace Waterer {
 			// not keybind button
 			if (e.Button.ToString() != this.config.KeyBind) return;
 
+			this.resetState();
+
 			this.log($"Pressed {this.config.KeyBind}");
 
 			this.activate();
@@ -44,7 +48,10 @@ namespace Waterer {
 		private void OnDayStarted(object sender, DayStartedEventArgs e) {
 			if (!this.config.AutoWaterEveryDay) return;
 
+			this.resetState();
+
 			this.log("Auto-watering");
+			this.autoWatering = true;
 
 			this.activate();
 		}
@@ -58,14 +65,16 @@ namespace Waterer {
 				return;
 			}
 
-			// reset
+			this.waterAllCrops(farmer);
+			this.chargeFarmer(farmer);
+		}
+
+		private void resetState() {
 			this.cropsWatered = 0;
 			this.ranOutOfMoney = false;
-			this.maxCropsToWater = this.calculateMaxAffordable(farmer);
-
-			this.waterAllCrops(farmer);
-
-			this.chargeFarmer(farmer);
+			this.autoWatering = false;
+			this.cropsSkipped = 0;
+			this.maxCropsToWater = this.calculateMaxAffordable(Game1.player);
 		}
 
 		private void chargeFarmer(Farmer farmer) {
@@ -77,6 +86,11 @@ namespace Waterer {
 			if (this.ranOutOfMoney) {
 				// show out-of-money-message as well as how much got done
 				HUDMessage msg = new HUDMessage("Couldn't water everything (no more gold)!", 3); // 3 = error
+				Game1.addHUDMessage(msg);
+			}
+
+			if (this.cropsWatered == 0 && !this.ranOutOfMoney) {
+				HUDMessage msg = new HUDMessage("There's nothing to water", 3); // 3 = error
 				Game1.addHUDMessage(msg);
 			}
 
@@ -94,6 +108,10 @@ namespace Waterer {
 				text += " tiles";
 			} else {
 				text += " crops";
+			}
+
+			if (this.cropsSkipped > 0) {
+				text += $" ({this.cropsSkipped} skipped)";
 			}
 
 			if (cost > 0) {
@@ -131,17 +149,20 @@ namespace Waterer {
 				// skip non-hoed dirt
 				if (!(feature.Value is HoeDirt dirt)) continue;
 
+				Crop crop = dirt.crop;
+
 				// if WaterAll is false, only water crops
-				if (!this.config.WaterAll && dirt.crop == null) {
+				if (!this.config.WaterAll && crop == null) {
 					this.log("Skipping non-crop");
 					continue;
 				}
 
 				// skip fully-grown crops with SkipFullyGrown
 				// (always water regrowing crops though)
+				// NOTE crop.fullyGrown seems to always return false
 				if (
 					this.config.SkipFullyGrown &&
-					(dirt.crop?.fullyGrown && dirt.crop?.regrowAfterHarvest.Value == -1)
+					(crop?.regrowAfterHarvest.Value == -1 && crop?.currentPhase == crop?.phaseDays.Count - 1)
 				) {
 					this.log("Skipping fully-grown crop");
 					continue;
@@ -153,8 +174,66 @@ namespace Waterer {
 					continue;
 				}
 
+				if (this.autoWatering && !this.shouldAutoWaterCrop(location, crop)) {
+					this.log("Not auto-watering crop");
+					this.cropsSkipped++;
+					continue;
+				}
+
 				dirt.state.Value = 1;
 				this.cropsWatered++;
+			}
+		}
+
+		// avoid auto watering plants that won't be harvestable by the end of the season
+		private bool shouldAutoWaterCrop(GameLocation location, Crop crop) {
+			// crops grow anytime in the greenhouse
+			if (location.Name.Contains("Greenhouse")) return true;
+
+			int totalDays = 0;
+			foreach (int p in crop.phaseDays) {
+				if (p == 99999) continue; // what is this?
+
+				totalDays += p;
+			}
+
+			int remainingSeasonDays = 28 - Game1.dayOfMonth;
+
+			// easy check
+			if (remainingSeasonDays >= totalDays) return true;
+
+			// crop grows in next season
+			if (crop.seasonsToGrowIn.Contains(this.getNextSeason(Game1.currentSeason))) return true;
+
+			int remainingGrowthDays;
+			if (crop.regrowAfterHarvest != -1 && crop.currentPhase >= crop.phaseDays.Count - 1) {
+				// crop is in regrowth phase
+				// NOTE dayOfCurrentPhase counts down once regrowing starts
+				remainingGrowthDays = crop.regrowAfterHarvest - (crop.regrowAfterHarvest - crop.dayOfCurrentPhase);
+			} else {
+				remainingGrowthDays = totalDays - crop.dayOfCurrentPhase;
+			}
+
+			return remainingSeasonDays >= remainingGrowthDays;
+		}
+
+		private string getNextSeason(string season) {
+			switch (season) {
+				case "spring": {
+					return "summer";
+				}
+				case "summer": {
+					return "fall";
+				}
+				case "fall": {
+					return "winter";
+				}
+				case "winter": {
+					return "spring";
+				}
+				default: {
+					return "spring";
+				}
 			}
 		}
 
