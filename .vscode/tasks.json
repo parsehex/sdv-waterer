@@ -4,13 +4,18 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build",
+			"label": "Build (Debug)",
 			"type": "shell",
-			"command": "mdtool build Waterer/Waterer.csproj",
+			"command": "mdtool build Waterer/Waterer.csproj -c:Debug",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "Build (Release)",
+			"type": "shell",
+			"command": "mdtool build Waterer/Waterer.csproj -c:Release"
 		}
 	]
 }
