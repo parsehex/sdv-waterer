@@ -80,24 +80,25 @@ namespace Waterer {
 		private void chargeFarmer(Farmer farmer) {
 			int cost = this.calculateCost();
 
-			farmer.Money -= cost;
-			this.log($"Charged {farmer.Name} {cost}g");
+			if (cost > 0) {
+				farmer.Money -= cost;
+				this.log($"Charged {farmer.Name} {cost}g");
+				this.showCostMessage(cost);
 
-			if (this.ranOutOfMoney) {
-				// show out-of-money-message as well as how much got done
-				HUDMessage msg = new HUDMessage("Couldn't water everything (no more gold)!", 3); // 3 = error
-				Game1.addHUDMessage(msg);
+				if (this.ranOutOfMoney) {
+					// show out-of-money-message as well as how much got done
+					HUDMessage msg = new HUDMessage("Couldn't water everything (no more gold)!", 3); // 3 = error
+					Game1.addHUDMessage(msg);
+				}
 			}
 
 			if (this.cropsWatered == 0 && !this.ranOutOfMoney) {
 				HUDMessage msg = new HUDMessage("There's nothing to water", 3); // 3 = error
 				Game1.addHUDMessage(msg);
 			}
-
-			this.showMessage(cost);
 		}
 
-		private void showMessage(int cost) {
+		private void showCostMessage(int cost) {
 			if (!this.config.Message) return;
 
 			string text = "";
@@ -248,7 +249,7 @@ namespace Waterer {
 			if (this.config.Price == 0) return 0;
 			if (this.cropsWatered == 0) return 0;
 
-			 // charge at least 1g
+			// charge at least 1g
 			return Math.Max(1, (int)Math.Round(this.config.Price * this.cropsWatered));
 		}
 	}
